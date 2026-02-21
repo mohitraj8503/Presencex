@@ -60,7 +60,8 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 1000;
+            z-index: 10001;
+            /* Above everything */
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -2045,7 +2046,8 @@
         }
 
         /* Modal Overlay */
-        .import-modal-overlay {
+        .import-modal-overlay,
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -2062,7 +2064,8 @@
             transition: opacity 0.3s ease;
         }
 
-        .import-modal-overlay.active {
+        .import-modal-overlay.active,
+        .modal-overlay.active {
             opacity: 1;
             pointer-events: all;
         }
