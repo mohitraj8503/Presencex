@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PresenceX · premium attendance</title>
     <!-- Font & styling -->
+    <!-- Performance Optimizations: Preload critical assets -->
+    <link rel="preload" href="./arka-jain-naac.png" as="image" fetchpriority="high">
+    <link rel="preload"
+        href="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGkyZfJgVpct.woff2"
+        as="font" type="font/woff2" crossorigin>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -2602,6 +2608,29 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+
+        /* Footer links */
+        .footer-links {
+            margin-top: 4rem;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(203, 213, 225, 0.4);
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #3b82f6;
+        }
     </style>
 </head>
 
@@ -2630,7 +2659,7 @@
             <div class="university-branding">
                 <div class="university-logos">
                     <img src="./arka-jain-naac.png" alt="ARKA JAIN University" class="arka-logo uni-logo"
-                        title="ARKA JAIN University, Jamshedpur" loading="lazy">
+                        title="ARKA JAIN University, Jamshedpur" fetchpriority="high" loading="eager">
                 </div>
             </div>
 
@@ -5418,7 +5447,16 @@
                     client_id: GS_CLIENT_ID,
                     scope: 'https://www.googleapis.com/auth/spreadsheets',
                     callback: (response) => {
-                        if (response.error) return;
+                        if (response.error) {
+                            if (response.error === 'access_denied') {
+                                alert('Google Access Denied: Please ensure your email is added as a "Test User" in the Google Cloud Console or wait for app verification.');
+                            } else if (response.error === 'popup_blocked') {
+                                showToast("Popup blocked! Please allow popups for Google Sign-in", "warning");
+                            } else {
+                                showToast("Auth Error: " + response.error, "error");
+                            }
+                            return;
+                        }
                         googleToken = response.access_token;
                         if (linkedSpreadsheetId) {
                             processGoogleUpdate();
@@ -5853,6 +5891,19 @@
                 document.getElementById('filterUnmarked').onclick = () => setFilter('unmarked', 'filterUnmarked');
             }
 
+            // Universal Modal Closing Handler
+            function closeAllModals() {
+                document.querySelectorAll('.import-modal-overlay, .modal-overlay').forEach(m => m.classList.remove('active'));
+                document.body.style.overflow = ''; // Restore scroll
+            }
+
+            // Close modals on overlay click
+            document.querySelectorAll('.import-modal-overlay, .modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) closeAllModals();
+                });
+            });
+
             // Deferred non-critical initialization for better TTI
             requestIdleCallback(() => {
                 // Keyboard shortcuts (Update UI triggers)
@@ -5863,8 +5914,7 @@
                     if (e.ctrlKey && e.key === 'e') { e.preventDefault(); document.getElementById('exportExcel').click(); }
                     if (e.key === '/') { e.preventDefault(); document.getElementById('searchInput').focus(); }
                     if (e.key === 'Escape') {
-                        document.querySelectorAll('.import-modal-overlay').forEach(m => m.classList.remove('active'));
-                        moreDropdown.classList.remove('active');
+                        closeAllModals();
                     }
                 });
 
@@ -5882,6 +5932,10 @@
         })();
 
     </script>
+    <div class="footer-links">
+        <a href="privacy.html" target="_blank">Privacy Policy</a>
+        <a href="terms.html" target="_blank">Terms of Service</a>
+    </div>
     <!-- Hidden Print Container for PDF Export -->
     <div id="printContainer" style="display:none;"></div>
 </body>
