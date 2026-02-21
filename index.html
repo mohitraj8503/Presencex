@@ -10,11 +10,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@600;700;800&display=swap"
-        rel="stylesheet">
-    <!-- SheetJS with styling support -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-    <!-- ExcelJS for in-place file editing -->
-    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+        rel="stylesheet" media="print" onload="this.media='all'">
+    <!-- SheetJS with styling support - DEFERRED -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" defer></script>
+    <!-- ExcelJS for in-place file editing - DEFERRED -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js" defer></script>
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
@@ -58,6 +58,80 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+
+        /* Loading Screen */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f7f9fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Skeleton styles */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f4f8 25%, #e2e8f0 50%, #f0f4f8 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 12px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         .toast {
@@ -2532,6 +2606,13 @@
 </head>
 
 <body>
+    <div id="loading-overlay">
+        <div class="loader-logo">
+            <span style="color: #1e293b;">Presence</span><span style="color: #3b82f6;">X</span>
+        </div>
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; color: #64748b; font-weight: 500;">Optimizing for mobile...</p>
+    </div>
     <div id="toast-container"></div>
     <div class="app">
         <!-- header -->
@@ -4093,15 +4174,53 @@
                 return filtered;
             }
 
+            // Event delegation for student rows (major performance boost)
+            studentListDiv.onclick = (e) => {
+                const row = e.target.closest('.student-row');
+                if (!row) return;
+
+                const idx = parseInt(row.dataset.index);
+                const visualIndex = Array.from(studentListDiv.children).indexOf(row);
+
+                // Shift+Click for bulk select
+                if (e.shiftKey && lastClickedIndex !== -1) {
+                    const filtered = filterStudents();
+                    const lastRow = studentListDiv.querySelector(`[data-index="${lastClickedIndex}"]`);
+                    const lastVisualIndex = Array.from(studentListDiv.children).indexOf(lastRow);
+
+                    if (lastVisualIndex !== -1) {
+                        const start = Math.min(lastVisualIndex, visualIndex);
+                        const end = Math.max(lastVisualIndex, visualIndex);
+
+                        history.push([...attendance]);
+                        const targetStatus = attendance[lastClickedIndex];
+                        for (let i = start; i <= end; i++) {
+                            const studentIdx = filtered[i].idx;
+                            attendance[studentIdx] = targetStatus;
+                        }
+                        refreshUI();
+                        saveState();
+                    }
+                } else {
+                    toggleStatus(idx);
+                }
+                lastClickedIndex = idx;
+            };
+
+            let renderTaskId = null;
             function renderList() {
-                // Guard against undefined elements
-                if (!studentListDiv) return;
-                if (!students || !attendance) return;
+                if (!studentListDiv || !students || !attendance) return;
+
+                // Cancel any pending render task
+                if (renderTaskId) cancelIdleCallback(renderTaskId);
 
                 const filtered = filterStudents();
-                const fragment = document.createDocumentFragment();
+                studentListDiv.innerHTML = '';
 
-                filtered.forEach((s) => {
+                const INITIAL_LOAD = 15;
+                const CHUNK_SIZE = 12;
+
+                function createRow(s) {
                     const status = attendance[s.idx];
                     let statusClass = '', statusText = 'Unmarked';
                     if (status === true) { statusClass = 'present'; statusText = 'Present'; }
@@ -4110,50 +4229,44 @@
                     const row = document.createElement('div');
                     row.className = `student-row ${statusClass}`;
                     row.dataset.index = s.idx;
-                    row.innerHTML = `
-                        <div class="student-info">
-                            <span class="student-name">${s.name}</span>
-                            <div class="student-details">
-                                <span>Roll ${s.roll}</span>
-                                <span>${s.enrolment}</span>
-                            </div>
-                        </div>
-                        <div class="status-badge">${statusText}</div>
-                    `;
-                    fragment.appendChild(row);
-                });
+                    // Optimized HTML string
+                    row.innerHTML = `<div class="student-info"><span class="student-name">${s.name}</span><div class="student-details"><span>Roll ${s.roll}</span><span>${s.enrolment}</span></div></div><div class="status-badge">${statusText}</div>`;
+                    return row;
+                }
 
-                // Single DOM update - much faster than innerHTML concatenation
-                studentListDiv.innerHTML = '';
+                // Initial fast render
+                const fragment = document.createDocumentFragment();
+                filtered.slice(0, INITIAL_LOAD).forEach(s => fragment.appendChild(createRow(s)));
                 studentListDiv.appendChild(fragment);
 
-                // Add click listeners with Shift+Click support for bulk selection
-                document.querySelectorAll('.student-row').forEach((row, visualIndex) => {
-                    row.addEventListener('click', (e) => {
-                        const idx = parseInt(row.dataset.index);
-
-                        // Shift+Click for bulk select
-                        if (e.shiftKey && lastClickedIndex !== -1) {
-                            const filtered = filterStudents();
-                            const lastVisualIndex = filtered.findIndex(s => s.idx === lastClickedIndex);
-                            const start = Math.min(lastVisualIndex, visualIndex);
-                            const end = Math.max(lastVisualIndex, visualIndex);
-
-                            history.push(attendance);
-                            const targetStatus = attendance[lastClickedIndex];
-                            for (let i = start; i <= end; i++) {
-                                const studentIdx = filtered[i].idx;
-                                attendance[studentIdx] = targetStatus;
-                            }
-                            refreshUI();
-                            saveState();
-                        } else {
-                            toggleStatus(idx);
-                        }
-
-                        lastClickedIndex = idx;
-                    });
+                // Dismiss loading screen quickly
+                requestAnimationFrame(() => {
+                    const overlay = document.getElementById('loading-overlay');
+                    if (overlay) {
+                        overlay.style.opacity = '0';
+                        setTimeout(() => overlay.remove(), 500);
+                    }
                 });
+
+                // Progressive background render
+                if (filtered.length > INITIAL_LOAD) {
+                    let currentIndex = INITIAL_LOAD;
+                    const renderRest = (deadline) => {
+                        while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && currentIndex < filtered.length) {
+                            const chunkFragment = document.createDocumentFragment();
+                            const limit = Math.min(currentIndex + CHUNK_SIZE, filtered.length);
+                            for (let i = currentIndex; i < limit; i++) {
+                                chunkFragment.appendChild(createRow(filtered[i]));
+                            }
+                            studentListDiv.appendChild(chunkFragment);
+                            currentIndex += CHUNK_SIZE;
+                        }
+                        if (currentIndex < filtered.length) {
+                            renderTaskId = requestIdleCallback(renderRest);
+                        }
+                    };
+                    renderTaskId = requestIdleCallback(renderRest);
+                }
             }
 
             function toggleStatus(index) {
@@ -5745,24 +5858,31 @@
                 document.getElementById('filterUnmarked').onclick = () => setFilter('unmarked', 'filterUnmarked');
             }
 
-            // Keyboard shortcuts (Update UI triggers)
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.key === 'z') { e.preventDefault(); document.getElementById('undoBtn').click(); }
-                if (e.ctrlKey && e.key === 'y') { e.preventDefault(); document.getElementById('redoBtn').click(); }
-                if (e.ctrlKey && e.key === 'g') { e.preventDefault(); document.getElementById('menuGenerateReport').click(); }
-                if (e.ctrlKey && e.key === 'e') { e.preventDefault(); document.getElementById('exportExcel').click(); }
-                if (e.key === '/') { e.preventDefault(); document.getElementById('searchInput').focus(); }
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.import-modal-overlay').forEach(m => m.classList.remove('active'));
-                    moreDropdown.classList.remove('active');
-                }
+            // Deferred non-critical initialization for better TTI
+            requestIdleCallback(() => {
+                // Keyboard shortcuts (Update UI triggers)
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'z') { e.preventDefault(); document.getElementById('undoBtn').click(); }
+                    if (e.ctrlKey && e.key === 'y') { e.preventDefault(); document.getElementById('redoBtn').click(); }
+                    if (e.ctrlKey && e.key === 'g') { e.preventDefault(); document.getElementById('menuGenerateReport').click(); }
+                    if (e.ctrlKey && e.key === 'e') { e.preventDefault(); document.getElementById('exportExcel').click(); }
+                    if (e.key === '/') { e.preventDefault(); document.getElementById('searchInput').focus(); }
+                    if (e.key === 'Escape') {
+                        document.querySelectorAll('.import-modal-overlay').forEach(m => m.classList.remove('active'));
+                        moreDropdown.classList.remove('active');
+                    }
+                });
+
+                // Periodic save
+                setInterval(saveState, 30000);
             });
 
-            // Initial pushes
-            setInterval(saveState, 30000);
-            history.push(attendance);
+            // Fast Initial Render
+            history.push([...attendance]);
             refreshUI();
-            setTimeout(loadState, 500);
+
+            // Load persistent state slightly later
+            setTimeout(loadState, 300);
 
         })();
 
