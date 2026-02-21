@@ -2461,6 +2461,7 @@
         /* ===== MOBILE PERFORMANCE OPTIMIZATIONS ===== */
         /* Reduce heavy effects on mobile to prevent scroll jank and overheating */
         @media (max-width: 768px) {
+
             /* Remove backdrop-filter on mobile - major paint cost */
             .toast,
             .subject-card,
@@ -2477,7 +2478,7 @@
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
             }
-            
+
             /* Simplify box-shadows on mobile */
             .subject-card,
             .list-card,
@@ -2485,12 +2486,12 @@
             .dock {
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
             }
-            
+
             /* Reduce gradients on mobile */
             body {
                 background: #f0f4f8;
             }
-            
+
             /* ULTRA SMOOTH SCROLLING for student list - GPU accelerated */
             #studentList {
                 -webkit-overflow-scrolling: touch;
@@ -2499,7 +2500,7 @@
                 will-change: scroll-position;
                 backface-visibility: hidden;
             }
-            
+
             /* GPU accelerate student rows */
             .student-row {
                 transform: translateZ(0);
@@ -2507,20 +2508,20 @@
                 backface-visibility: hidden;
                 -webkit-transform: translateZ(0);
             }
-            
+
             /* Remove expensive transitions on mobile */
             .student-row,
             .status-badge {
                 transition: none !important;
             }
-            
+
             /* Optimize status badge for mobile */
             .status-badge {
                 border-radius: 8px !important;
                 backdrop-filter: none !important;
             }
         }
-        
+
         /* Enable smooth scrolling everywhere */
         html {
             scroll-behavior: smooth;
@@ -3730,68 +3731,68 @@
             }
 
             // ---------- CLEANED STUDENT DATA ----------
-const students = [
-  { roll: 1, name: "Sangam Kumar", enrolment: "AJU/250052" },
-  { roll: 2, name: "Kumari Shashi Verma", enrolment: "AJU/250055" },
-  { roll: 3, name: "Arpit Swarnkar", enrolment: "AJU/250197" },
-  { roll: 4, name: "Surjo Banerjee", enrolment: "AJU/250201" },
-  { roll: 5, name: "Mohit Verma", enrolment: "AJU/250289" },
-  { roll: 6, name: "Rohan Thakur", enrolment: "AJU/250325" },
-  { roll: 7, name: "Kumari Raj Nandani", enrolment: "AJU/250402" },
-  { roll: 8, name: "Tanmaya Behera", enrolment: "AJU/250416" },
-  { roll: 9, name: "Nishant Tiwary", enrolment: "AJU/250419" },
-  { roll: 10, name: "Jaisleen Kaur", enrolment: "AJU/250475" },
-  { roll: 11, name: "Khushwant Mardi", enrolment: "AJU/250478" },
-  { roll: 12, name: "Rishu Singh", enrolment: "AJU/250505" },
-  { roll: 13, name: "Soni Singh", enrolment: "AJU/250506" },
-  { roll: 14, name: "Pallavi Kumari", enrolment: "AJU/250564" },
-  { roll: 15, name: "Harshdeep Singh", enrolment: "AJU/250572" },
-  { roll: 16, name: "Rupesh Anand", enrolment: "AJU/250579" },
-  { roll: 17, name: "Azlan Ali", enrolment: "AJU/250582" },
-  { roll: 18, name: "Suraj Mallik", enrolment: "AJU/250620" },
-  { roll: 19, name: "Sarvottam Priye", enrolment: "AJU/250685" },
-  { roll: 20, name: "Chetan Singh", enrolment: "AJU/250775" },
-  { roll: 21, name: "Mohammad Kamran Alvi", enrolment: "AJU/250779" },
-  { roll: 22, name: "Mohammad Rehan", enrolment: "AJU/250848" },
-  { roll: 23, name: "Rishika Kumari", enrolment: "AJU/250878" },
-  { roll: 24, name: "Gourav Kumar Mahato", enrolment: "AJU/250885" },
-  { roll: 25, name: "Raju Gorai", enrolment: "AJU/250993" },
-  { roll: 26, name: "Ishika Kumari", enrolment: "AJU/251021" },
-  { roll: 27, name: "Naina Kumari", enrolment: "AJU/251025" },
-  { roll: 28, name: "Ritika Kumari", enrolment: "AJU/251088" },
-  { roll: 29, name: "Farhan Khalid", enrolment: "AJU/251152" },
-  { roll: 30, name: "Amrit Ranjan", enrolment: "AJU/251221" },
-  { roll: 31, name: "Soumya Mishra", enrolment: "AJU/251316" },
-  { roll: 32, name: "Shivam Purty", enrolment: "AJU/251335" },
-  { roll: 33, name: "Arshal Nasim", enrolment: "AJU/251377" },
-  { roll: 34, name: "Hemant Kumar", enrolment: "AJU/251442" },
-  { roll: 35, name: "Simiya Khatoon", enrolment: "AJU/251452" },
-  { roll: 36, name: "Umair Raza", enrolment: "AJU/251455" },
-  { roll: 37, name: "Anish Kumar Mahato", enrolment: "AJU/251472" },
-  { roll: 38, name: "Kritika Raj", enrolment: "AJU/251580" },
-  { roll: 39, name: "Rahul Kumar Mandal", enrolment: "AJU/251641" },
-  { roll: 40, name: "Keshav Chourasia", enrolment: "AJU/251694" },
-  { roll: 41, name: "Priyanshu Sen", enrolment: "AJU/251734" },
-  { roll: 42, name: "Ayush Kumar", enrolment: "AJU/251740" },
-  { roll: 43, name: "Mohani Prasad", enrolment: "AJU/251755" },
-  { roll: 44, name: "Rahul Kumar Singh", enrolment: "AJU/251798" },
-  { roll: 45, name: "Paras", enrolment: "AJU/251858" },
-  { roll: 46, name: "Ayushman Mandal", enrolment: "AJU/251907" },
-  { roll: 47, name: "Mohammad Aaban Ahmad", enrolment: "AJU/251969" },
-  { roll: 48, name: "Harsh Nayan", enrolment: "AJU/251999" },
-  { roll: 49, name: "Ayush Kumar Singh", enrolment: "AJU/252009" },
-  { roll: 50, name: "Janvi Sinha", enrolment: "AJU/252075" },
-  { roll: 51, name: "Ashutosh Kumar Sharma", enrolment: "AJU/252078" },
-  { roll: 52, name: "Humaira Kayenat", enrolment: "AJU/252105" },
-  { roll: 55, name: "Vedant Pandey", enrolment: "AJU/252470" },
-  { roll: 57, name: "G. Omkeswari", enrolment: "AJU/250193" },
-  { roll: 58, name: "Mohit Raj", enrolment: "AJU/250609" },
-  { roll: 59, name: "Shreya Sharma", enrolment: "AJU/252692" },
-  { roll: 62, name: "ROHIT KUMAR", enrolment: "AJU/252782" },
-  { roll: 63, name: "Shristi Kumari", enrolment: "AJU/252812" },
-  { roll: 64, name: "MD NASEEB KHAN", enrolment: "AJU/252821" },
-  { roll: 68, name: "Aishwarya Sinha", enrolment: "AJU/242100" }
-];
+            const students = [
+                { roll: 1, name: "Sangam Kumar", enrolment: "AJU/250052" },
+                { roll: 2, name: "Kumari Shashi Verma", enrolment: "AJU/250055" },
+                { roll: 3, name: "Arpit Swarnkar", enrolment: "AJU/250197" },
+                { roll: 4, name: "Surjo Banerjee", enrolment: "AJU/250201" },
+                { roll: 5, name: "Mohit Verma", enrolment: "AJU/250289" },
+                { roll: 6, name: "Rohan Thakur", enrolment: "AJU/250325" },
+                { roll: 7, name: "Kumari Raj Nandani", enrolment: "AJU/250402" },
+                { roll: 8, name: "Tanmaya Behera", enrolment: "AJU/250416" },
+                { roll: 9, name: "Nishant Tiwary", enrolment: "AJU/250419" },
+                { roll: 10, name: "Jaisleen Kaur", enrolment: "AJU/250475" },
+                { roll: 11, name: "Khushwant Mardi", enrolment: "AJU/250478" },
+                { roll: 12, name: "Rishu Singh", enrolment: "AJU/250505" },
+                { roll: 13, name: "Soni Singh", enrolment: "AJU/250506" },
+                { roll: 14, name: "Pallavi Kumari", enrolment: "AJU/250564" },
+                { roll: 15, name: "Harshdeep Singh", enrolment: "AJU/250572" },
+                { roll: 16, name: "Rupesh Anand", enrolment: "AJU/250579" },
+                { roll: 17, name: "Azlan Ali", enrolment: "AJU/250582" },
+                { roll: 18, name: "Suraj Mallik", enrolment: "AJU/250620" },
+                { roll: 19, name: "Sarvottam Priye", enrolment: "AJU/250685" },
+                { roll: 20, name: "Chetan Singh", enrolment: "AJU/250775" },
+                { roll: 21, name: "Mohammad Kamran Alvi", enrolment: "AJU/250779" },
+                { roll: 22, name: "Mohammad Rehan", enrolment: "AJU/250848" },
+                { roll: 23, name: "Rishika Kumari", enrolment: "AJU/250878" },
+                { roll: 24, name: "Gourav Kumar Mahato", enrolment: "AJU/250885" },
+                { roll: 25, name: "Raju Gorai", enrolment: "AJU/250993" },
+                { roll: 26, name: "Ishika Kumari", enrolment: "AJU/251021" },
+                { roll: 27, name: "Naina Kumari", enrolment: "AJU/251025" },
+                { roll: 28, name: "Ritika Kumari", enrolment: "AJU/251088" },
+                { roll: 29, name: "Farhan Khalid", enrolment: "AJU/251152" },
+                { roll: 30, name: "Amrit Ranjan", enrolment: "AJU/251221" },
+                { roll: 31, name: "Soumya Mishra", enrolment: "AJU/251316" },
+                { roll: 32, name: "Shivam Purty", enrolment: "AJU/251335" },
+                { roll: 33, name: "Arshal Nasim", enrolment: "AJU/251377" },
+                { roll: 34, name: "Hemant Kumar", enrolment: "AJU/251442" },
+                { roll: 35, name: "Simiya Khatoon", enrolment: "AJU/251452" },
+                { roll: 36, name: "Umair Raza", enrolment: "AJU/251455" },
+                { roll: 37, name: "Anish Kumar Mahato", enrolment: "AJU/251472" },
+                { roll: 38, name: "Kritika Raj", enrolment: "AJU/251580" },
+                { roll: 39, name: "Rahul Kumar Mandal", enrolment: "AJU/251641" },
+                { roll: 40, name: "Keshav Chourasia", enrolment: "AJU/251694" },
+                { roll: 41, name: "Priyanshu Sen", enrolment: "AJU/251734" },
+                { roll: 42, name: "Ayush Kumar", enrolment: "AJU/251740" },
+                { roll: 43, name: "Mohani Prasad", enrolment: "AJU/251755" },
+                { roll: 44, name: "Rahul Kumar Singh", enrolment: "AJU/251798" },
+                { roll: 45, name: "Paras", enrolment: "AJU/251858" },
+                { roll: 46, name: "Ayushman Mandal", enrolment: "AJU/251907" },
+                { roll: 47, name: "Mohammad Aaban Ahmad", enrolment: "AJU/251969" },
+                { roll: 48, name: "Harsh Nayan", enrolment: "AJU/251999" },
+                { roll: 49, name: "Ayush Kumar Singh", enrolment: "AJU/252009" },
+                { roll: 50, name: "Janvi Sinha", enrolment: "AJU/252075" },
+                { roll: 51, name: "Ashutosh Kumar Sharma", enrolment: "AJU/252078" },
+                { roll: 52, name: "Humaira Kayenat", enrolment: "AJU/252105" },
+                { roll: 55, name: "Vedant Pandey", enrolment: "AJU/252470" },
+                { roll: 57, name: "G. Omkeswari", enrolment: "AJU/250193" },
+                { roll: 58, name: "Mohit Raj", enrolment: "AJU/250609" },
+                { roll: 59, name: "Shreya Sharma", enrolment: "AJU/252692" },
+                { roll: 62, name: "ROHIT KUMAR", enrolment: "AJU/252782" },
+                { roll: 63, name: "Shristi Kumari", enrolment: "AJU/252812" },
+                { roll: 64, name: "MD NASEEB KHAN", enrolment: "AJU/252821" },
+                { roll: 68, name: "Aishwarya Sinha", enrolment: "AJU/242100" }
+            ];
 
             // ---------- TIMETABLE ----------
             const fullTimetable = {
@@ -4066,14 +4067,14 @@ const students = [
             function filterStudents() {
                 const term = searchInput.value.toLowerCase();
                 const filtered = [];
-                
+
                 // Single pass through students array
                 for (let i = 0; i < students.length; i++) {
                     const s = students[i];
                     const nameMatch = s.name.toLowerCase().includes(term);
                     const rollMatch = s.roll.toString().includes(term);
                     const enrolMatch = s.enrolment.toLowerCase().includes(term);
-                    
+
                     if (nameMatch || rollMatch || enrolMatch) {
                         // Apply status filter
                         const status = attendance[i];
@@ -4088,7 +4089,7 @@ const students = [
                         }
                     }
                 }
-                
+
                 return filtered;
             }
 
@@ -4096,10 +4097,10 @@ const students = [
                 // Guard against undefined elements
                 if (!studentListDiv) return;
                 if (!students || !attendance) return;
-                
+
                 const filtered = filterStudents();
                 const fragment = document.createDocumentFragment();
-                
+
                 filtered.forEach((s) => {
                     const status = attendance[s.idx];
                     let statusClass = '', statusText = 'Unmarked';
@@ -4121,7 +4122,7 @@ const students = [
                     `;
                     fragment.appendChild(row);
                 });
-                
+
                 // Single DOM update - much faster than innerHTML concatenation
                 studentListDiv.innerHTML = '';
                 studentListDiv.appendChild(fragment);
@@ -4159,7 +4160,7 @@ const students = [
                 // Guard against invalid index
                 if (index === undefined || index === null || index < 0) return;
                 if (!attendance || index >= attendance.length) return;
-                
+
                 history.push(attendance);
                 if (attendance[index] === true) attendance[index] = false;
                 else if (attendance[index] === false) attendance[index] = null;
@@ -4394,7 +4395,7 @@ const students = [
             // Throttle scroll handler for better performance (mobile-critical)
             function throttleScroll(fn, wait) {
                 let lastTime = 0;
-                return function(...args) {
+                return function (...args) {
                     const now = Date.now();
                     if (now - lastTime >= wait) {
                         lastTime = now;
@@ -5658,24 +5659,22 @@ const students = [
                     copyCellStyle(refCell, cell);
 
                     // Set Value & Override Fill
-                    if (dow === 0) {
+                    if (s.status === "P") {
+                        cell.value = "✓";
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } };
+                        cell.font = { color: { argb: 'FF166534' }, bold: true };
+                    } else if (s.status === "A") {
+                        cell.value = "✗";
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+                        cell.font = { color: { argb: 'FF991B1B' }, bold: true };
+                    } else if (dow === 0) {
                         cell.value = "SUN";
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE5E7EB' } };
                     } else if (dow === 6) {
                         cell.value = "SAT";
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE5E7EB' } };
                     } else {
-                        if (s.status === "P") {
-                            cell.value = "✓";
-                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } };
-                            cell.font = { color: { argb: 'FF166534' }, bold: true };
-                        } else if (s.status === "A") {
-                            cell.value = "✗";
-                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
-                            cell.font = { color: { argb: 'FF991B1B' }, bold: true };
-                        } else {
-                            cell.value = "";
-                        }
+                        cell.value = "";
                     }
                     cell.alignment = { vertical: 'middle', horizontal: 'center' };
                 });
