@@ -5780,14 +5780,9 @@
                         cell.value = "✗";
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
                         cell.font = { color: { argb: 'FF991B1B' }, bold: true };
-                    } else if (dow === 0) {
-                        cell.value = "SUN";
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE5E7EB' } };
-                    } else if (dow === 6) {
-                        cell.value = "SAT";
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE5E7EB' } };
                     } else {
                         cell.value = "";
+                        cell.fill = { type: 'pattern', pattern: 'none' };
                     }
                     cell.alignment = { vertical: 'middle', horizontal: 'center' };
                 });
