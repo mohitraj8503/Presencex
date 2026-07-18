@@ -9,6 +9,8 @@ Built with clean UI principles, powerful Excel integration, and real-time report
 
 # git is good 
 
+This is me making changes 
+
 ✨ Features
 📋 Smart Attendance Marking
 
