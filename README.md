@@ -5,6 +5,8 @@ PresenceX — Premium Attendance & Reporting System built for IBM Classroom at A
 A modern, minimal, and intelligent attendance management system designed specifically for classroom environments.
 Built with clean UI principles, powerful Excel integration, and real-time reporting.
 
+this is new commit 
+
 ✨ Features
 📋 Smart Attendance Marking
 
